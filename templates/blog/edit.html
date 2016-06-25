@@ -1,0 +1,27 @@
+{% include 'blog/partials/header.html' %}
+<div class='ui main text container text segment'>
+    <div class="ui huge header">Edit {{ blog.title }}</div>
+    <form action="/blogs/{{ blog.id }}/" data-method="PUT" class="ui form">
+        <div class="field">
+            <label>Title</label>
+            <input name="title" value="{{ blog.title }}" type='text'>
+        </div>
+        <div class="field">
+            <label>Image</label>
+            <input name='image' value="{{ blog.image }}" type="url">
+        </div>
+        <div class="field">
+            <label>Content</label>
+            <textarea name='body' placeholder="content of the new post...">{{ blog.body }}</textarea>
+        </div>
+        <button class="ui violet basic button" type="submit">Save</button>
+    </form>
+</div>
+ <script>
+    $(document).ready(function() {
+        $('form').ajaxForm();
+    });
+ </script>
+
+</body>
+</html>

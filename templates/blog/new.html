@@ -1,0 +1,21 @@
+{% include 'blog/partials/header.html' %}
+<div class='ui main text container text segment'>
+    <div class="ui huge header">New Post</div>
+    <form action="/blogs/" method="POST" class="ui form">
+        <div class="field">
+            <label>Title</label>
+            <input name="title" placeholder="name of the post" type='text'>
+        </div>
+        <div class="field">
+            <label>Image</label>
+            <input name='image' placeholder="url of image" type="url">
+        </div>
+        <div class="field">
+            <label>Content</label>
+            <textarea name='body' placeholder="content of the new post..."></textarea>
+        </div>
+        <button class="ui violet basic button" type="submit">Save</button>
+    </form>
+</div>
+</body>
+</html>
