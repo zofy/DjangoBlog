@@ -1,7 +1,5 @@
 from django.core.urlresolvers import reverse
 from rest_framework.test import APITestCase, APIRequestFactory
-
-from blog.tests import BlogTestCase
 from comments.models import Comment
 from comments.views import ShowView
 
@@ -9,20 +7,20 @@ from comments.views import ShowView
 class CommentTestCase(APITestCase):
     factory = APIRequestFactory()
 
-    def create_comment(self, parent=1, body='some text', depth=1):
-        return Comment.objects.create(parent=parent, body=body, depth=depth)
+    def create_comment(self, blog_id=1, body='some text', depth=1):
+        return Comment.objects.create(blog_id=blog_id, body=body, depth=depth)
 
     def test_create_comment(self):
-        data = {'parent': 8, 'body': 'generated text', 'depth': 2}
+        data = {'blog_id': 8, 'body': 'generated text', 'depth': 2}
         url = reverse('comments:index', args=[8])
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Comment.objects.count(), 1)
-        self.assertEqual(Comment.objects.get().parent, 8)
+        self.assertEqual(Comment.objects.get().blog_id, 8)
 
     def test_show_comments(self):
         c = self.create_comment()
-        url = reverse('comments:index', args=[c.parent])
+        url = reverse('comments:index', args=[c.blog_id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), 1)
@@ -33,7 +31,7 @@ class CommentTestCase(APITestCase):
         url = reverse('comments:show', args=[c.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()['parent'], c.parent)
+        self.assertEqual(response.json()['blog_id'], c.blog_id)
 
     def test_show_put(self):
         c = self.create_comment()

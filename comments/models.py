@@ -7,7 +7,8 @@ class Comment(models.Model):
     down_votes = models.PositiveIntegerField(default=0)
     _lower_bound = models.FloatField(default=0)
     depth = models.PositiveIntegerField(default=0)
-    parent = models.PositiveIntegerField(null=True)  # id of Blog Post
+    blog_id = models.PositiveIntegerField(default=0)  # id of Blog Post
+    parent = models.PositiveIntegerField(null=True)
     path = models.TextField(null=True)
     hidden = models.BooleanField(default=False)
 
