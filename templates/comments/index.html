@@ -2,9 +2,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Comments</title>
+    {% load staticfiles %}
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
+    <link rel="stylesheet" href="{% static 'blog/index.css' %}"/>
+    <script
+            src="https://code.jquery.com/jquery-1.12.4.min.js"
+            integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
+            crossorigin="anonymous"></script>
+    <title>ShowPage</title>
 </head>
 <body>
-    
+{% csrf_token %}
+<h1>Commenting System</h1>
+<div class="container">
+    <ul id="commenters">
+        {% for c in comment_tree %}
+        <li id="{{ c.id }}" class="c" style="margin-left:{{ c.depth|add:c.depth }}em;">
+            <p class="poster">Anonymous - {{ c.date }}</p>
+            {% if not c.hidden %}
+            <p>{{ c.body }}</p>
+            {% else %}
+            <p>This comment has been hidden</p>
+            {% endif %}
+            <p><i class="fa fa-plus" aria-hidden="true"></i> <i class="fa fa-minus" aria-hidden="true"></i> <a
+                    class="reply">reply</a></p>
+        </li>
+        {% empty %}
+        <li>There are currently no comments. You can be first!</li>
+        {% endfor %}
+    </ul>
+    <div class="container listing">
+        <p id="prev">Previous</p>
+        <p id="next">Next</p>
+    </div>
+</div>
 </body>
 </html>

@@ -1,9 +1,11 @@
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from comments.models import Comment
+from comments.serializers import CommentSerializer
 
 
 class IndexView(APIView):
@@ -15,12 +17,13 @@ class IndexView(APIView):
 
     def get(self, request, blog_id):
         comments = self.get_comments(blog_id)
-        return render(request, 'comments/index.html', {'comments': comments})
-        # serializer = BlogSerializer(posts, many=True)
-        # return Response(serializer.data)
+        # return render(request, 'comments/index.html', {'comment_tree': comments})
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data)
 
-    def post(self, request):
+    def post(self, request, blog_id):
         data = {atr: request.data[atr] for atr in request.data}
+        data['parent'] = blog_id
         Comment.objects.create(**data).save()
         return HttpResponseRedirect('/blogs')
 
@@ -33,8 +36,8 @@ class ShowView(APIView):
             return Http404
 
     def get(self, request, id):
-        return render(request, 'comments/show.html', {'comments': self.get_comment(id)})
-        # return Response(BlogSerializer(self.get_blog(id)).data)
+        # return render(request, 'comments/show.html', {'comments': self.get_comment(id)})
+        return Response(CommentSerializer(self.get_comment(id)).data)
 
     def put(self, request, id):
         comment = self.get_comment(id)
