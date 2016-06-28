@@ -9,7 +9,7 @@ class Comment(models.Model):
     depth = models.PositiveIntegerField(default=0)
     parent = models.PositiveIntegerField(null=True)  # id of Blog Post
     path = models.TextField(null=True)
-    hidden = models.BooleanField(default=False)
+    visible = models.BooleanField(default=False)
 
     @property
     def lower_bound(self):
