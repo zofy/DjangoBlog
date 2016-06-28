@@ -9,15 +9,15 @@ class Comment(models.Model):
     depth = models.PositiveIntegerField(default=0)
     parent = models.PositiveIntegerField(null=True)  # id of Blog Post
     path = models.TextField(null=True)
-    visible = models.BooleanField(default=False)
+    hidden = models.BooleanField(default=False)
 
     @property
     def lower_bound(self):
         return self._lower_bound
 
-    @lower_bound.setter
-    def lower_bound(self):
-        self.set_lower_bound()
+    # @lower_bound.setter
+    # def lower_bound(self):
+    #     self.set_lower_bound()
 
     def set_lower_bound(self):
         n = self.up_votes + self.down_votes
