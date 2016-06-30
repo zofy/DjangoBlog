@@ -4,19 +4,14 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from comments.models import Comment
+from comments.models import Comment, CommentManager
 from comments.serializers import CommentSerializer
 
 
 class IndexView(APIView):
-    def get_comments(self, blog_id):
-        try:
-            return Comment.objects.filter(blog_id=blog_id).order_by('path')
-        except:
-            return Http404
 
     def get(self, request, blog_id):
-        comments = self.get_comments(blog_id)
+        comments = CommentManager.get_comments(blog_id)
         return render(request, 'comments/index.html', {'comment_tree': comments})
         # serializer = CommentSerializer(comments, many=True)
         # return Response(serializer.data)
@@ -24,8 +19,15 @@ class IndexView(APIView):
     def post(self, request, blog_id):
         # in data must be id of a parent_comment
         data = {atr: request.data[atr] for atr in request.data}
-        data['blog_id'] = blog_id
-        Comment.objects.create(**data).save()
+        if data['parent']:
+            parent_comment = self.get_parent_comment(data['parent'])
+            data['blog_id'] = parent_comment.blog_id
+            data['path'] = parent_comment.path
+        else:
+            data['blog_id'] = blog_id
+        c = Comment.objects.create(**data).save()
+        c.path += ' ' + c.id
+        c.save()
         return HttpResponseRedirect('/blogs')
 
 

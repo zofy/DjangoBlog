@@ -1,6 +1,23 @@
 from django.db import models
 
 
+class CommentManager(models.Manager):
+    def get_blog_comments(self, blog_id):
+        try:
+            return Comment.objects.filter(blog_id=blog_id).order_by('path')
+        except:
+            return []
+
+    def get_parent_comment(self, parent_id):
+        try:
+            return Comment.objects.get(id=parent_id)
+        except:
+            pass
+
+    def create_comment(self, data):
+        pass
+
+
 class Comment(models.Model):
     body = models.TextField()
     up_votes = models.PositiveIntegerField(default=0)
@@ -8,9 +25,11 @@ class Comment(models.Model):
     _lower_bound = models.FloatField(default=0)
     depth = models.PositiveIntegerField(default=0)
     blog_id = models.PositiveIntegerField(default=0)  # id of Blog Post
-    parent = models.PositiveIntegerField(null=True)
-    path = models.TextField(null=True)
+    parent = models.PositiveIntegerField(default=None)
+    path = models.TextField(default=None)
     hidden = models.BooleanField(default=False)
+
+    objects = CommentManager
 
     @property
     def lower_bound(self):
@@ -28,4 +47,4 @@ class Comment(models.Model):
         z = 1.96
         phat = 1.0 * pos / n
         self.lower_bound = (phat + z * z / (2 * n) - z * ((phat * (1 - phat) + z * z / (4 * n)) / n)) / (
-                                                                                                        1 + z * z / n) ** 0.5
+                                                                                                            1 + z * z / n) ** 0.5
