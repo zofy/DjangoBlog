@@ -11,7 +11,7 @@ class CommentTestCase(APITestCase):
         return Comment.objects.create(blog_id=blog_id, body=body, depth=depth)
 
     def test_create_comment(self):
-        data = {'blog_id': 8, 'body': 'generated text', 'depth': 2}
+        data = {'blog_id': 8, 'body': 'generated text', 'depth': 2, }
         url = reverse('comments:index', args=[8])
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 302)

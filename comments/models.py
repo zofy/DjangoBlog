@@ -2,6 +2,13 @@ from django.db import models
 
 
 class CommentManager(models.Manager):
+
+    def get_comment(self, id):
+        try:
+            return Comment.objects.get(id=id)
+        except:
+            raise Exception('Comment not found!')
+
     def get_blog_comments(self, blog_id):
         try:
             return Comment.objects.filter(blog_id=blog_id).order_by('path')
@@ -12,10 +19,29 @@ class CommentManager(models.Manager):
         try:
             return Comment.objects.get(id=parent_id)
         except:
-            pass
+            raise Exception('Parent comment not found!')
 
-    def create_comment(self, data):
-        pass
+    def create_comment(self, blog_id, data):
+        if 'parent' in data:
+            parent_comment = self.get_parent_comment(data['parent'])
+            data['path'] = parent_comment.path
+        data['blog_id'] = blog_id
+        c = Comment.objects.create(**data)
+        c.save()
+        if c.path:
+            c.path += ' ' + str(c.id)
+        else:
+            c.path = str(c.id)
+        c.save()
+
+    def update_comment(self, id, data):
+        comment = self.get_comment(id)
+        for atr in data:
+            setattr(comment, atr, data[atr])
+        comment.save()
+
+    def delete_comment(self, id):
+        self.get_comment(id).delete()
 
 
 class Comment(models.Model):
@@ -25,11 +51,11 @@ class Comment(models.Model):
     _lower_bound = models.FloatField(default=0)
     depth = models.PositiveIntegerField(default=0)
     blog_id = models.PositiveIntegerField(default=0)  # id of Blog Post
-    parent = models.PositiveIntegerField(default=None)
-    path = models.TextField(default=None)
+    parent = models.PositiveIntegerField(default=None, null=True)
+    path = models.TextField(default=None, null=True)
     hidden = models.BooleanField(default=False)
 
-    objects = CommentManager
+    objects = CommentManager()
 
     @property
     def lower_bound(self):
