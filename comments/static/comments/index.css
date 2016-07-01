@@ -2,27 +2,20 @@ a {
     font-weight: bold;
     color: #499bcf;
     text-decoration: none;
+    margin: 10px;
 }
 
-a:hover {
-    text-decoration: underline;
-}
-
-#commenters {
+#comments_tree {
     padding-left: 0px;
 }
 
-#commenters li {
+#comments_tree li {
     list-style-type: none;
 }
 
 .poster {
     font-size: 12px;
     color: #AAAAAA;
-}
-
-#postcomment ul {
-    padding-left: 0px;
 }
 
 #postcomment ul li {
@@ -51,17 +44,11 @@ a:hover {
     width: 30%;
 }
 
-.listing {
-    display: inline-block;
-}
-
-.listing p {
-    width: 30%;
-    margin: 0 30%;
-    display: inline-block;
-}
-
 .fa {
     width: 10px;
     padding: 10px;
+}
+
+.fa:hover{
+    color: #397098;
 }

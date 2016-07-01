@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     {% load staticfiles %}
     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
-    <link rel="stylesheet" href="{% static 'blog/index.css' %}"/>
+    <link rel='stylesheet' href= "https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{% static 'comments/index.css' %}"/>
     <script
             src="https://code.jquery.com/jquery-1.12.4.min.js"
             integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
@@ -15,7 +16,7 @@
 {% csrf_token %}
 <h1>Commenting System</h1>
 <div class="container">
-    <ul id="commenters">
+    <ul id="comments_tree">
         {% for c in comment_tree %}
         <li id="{{ c.id }}" class="c" style="margin-left:{{ c.depth|add:c.depth }}em;">
             <p class="poster">Anonymous - {{ c.date }}</p>
@@ -24,17 +25,17 @@
             {% else %}
             <p>This comment has been hidden</p>
             {% endif %}
-            <p><i class="fa fa-plus" aria-hidden="true"></i> <i class="fa fa-minus" aria-hidden="true"></i> <a
-                    class="reply">reply</a></p>
+            <p><i class="fa fa-chevron-up" aria-hidden="true"></i><i class="fa fa-chevron-down" aria-hidden="true"></i>
+                <a class="reply">reply</a></p>
         </li>
         {% empty %}
         <li>There are currently no comments. You can be first!</li>
         {% endfor %}
     </ul>
-    <div class="container listing">
-        <p id="prev">Previous</p>
-        <p id="next">Next</p>
-    </div>
+    <span id="prev"><i class="fa fa-chevron-left" aria-hidden="true"></i> Previous</span>
+    <span id="next">Next <i class="fa fa-chevron-right" aria-hidden="true"></i>
+</span>
 </div>
+<script type="text/javascript" src="{% static 'comments/comments.js' %}"></script>
 </body>
 </html>
