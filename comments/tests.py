@@ -11,8 +11,8 @@ class CommentTestCase(APITestCase):
         return Comment.objects.create(blog_id=blog_id, body=body, depth=depth)
 
     def test_create_comment(self):
-        data = {'blog_id': 8, 'body': 'generated text', 'depth': 2, }
-        url = reverse('comments:index', args=[8])
+        data = {'blog_id': 8, 'body': 'generated text', 'depth': 2 }
+        url = reverse('comments:index', args=[8, 0])
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Comment.objects.count(), 1)
@@ -20,11 +20,11 @@ class CommentTestCase(APITestCase):
 
     def test_show_comments(self):
         c = self.create_comment()
-        url = reverse('comments:index', args=[c.blog_id])
+        url = reverse('comments:index', args=[c.blog_id, 0])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['body'], 'some text')
+        self.assertEqual(response.json()['comment_tree'][0]['body'], 'some text')
 
     def test_show_get(self):
         c = self.create_comment()
