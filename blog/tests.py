@@ -25,7 +25,7 @@ class BlogTestCase(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), 1)
-        self.assertEqual(response.json()[0]['title'], 'Post1')
+        self.assertEqual(response.json()['blogs'][0]['title'], 'Post1')
 
     def test_show_get(self):
         b = self.create_post()

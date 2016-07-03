@@ -36,12 +36,14 @@ class CommentTestCase(APITestCase):
     def test_show_put(self):
         c = self.create_comment()
         url = reverse('comments:show', args=[c.id])
-        data = {'depth': 3, 'body': 'Some random updated text'}
+        data = {'depth': 3, 'body': 'Some random updated text', 'up_votes': 1}
         view = ShowView.as_view()
         response = view(self.factory.put(url, data), c.id)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Comment.objects.get().depth, data['depth'])
         self.assertEqual(Comment.objects.get().body, data['body'])
+        self.assertEqual(Comment.objects.get().up_votes, 1)
+        self.assertNotEquals(Comment.objects.get().lower_bound, 0)
 
     def test_show_delete(self):
         c = self.create_comment()

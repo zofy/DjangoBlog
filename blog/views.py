@@ -27,35 +27,31 @@ def edit(request, id):
 class IndexView(APIView):
     def get(self, request):
         posts = Blog.objects.all()
-        return render(request, 'blog/index.html', {'blogs': posts})
-        # serializer = BlogSerializer(posts, many=True)
-        # return Response(serializer.data)
+        serializer = BlogSerializer(posts, many=True)
+        return Response({'blogs': serializer.data}, template_name='blog/index.html')
 
     def post(self, request):
         data = {atr: request.data[atr] for atr in request.data}
-        Blog.objects.create(**data).save()
+        Blog.objects.create_post(data)
         return HttpResponseRedirect('/blogs')
 
 
 class ShowView(APIView):
-    def get_blog(self, id):
-        try:
-            return Blog.objects.get(pk=id)
-        except:
-            return Http404
 
-    def get(self, request, id):
-        return render(request, 'blog/show.html', {'blog': self.get_blog(id)})
-        # return Response(BlogSerializer(self.get_blog(id)).data)
+    def get(self, request, **kwargs):
+        # return render(request, 'blog/show.html', {'blog': Blog.objects.get_blog(id)})
+        return Response({'blog': BlogSerializer(self.get_blog(kwargs['id'])).data}, template_name='blog/show.html')
 
-    def put(self, request, id):
-        post = self.get_blog(id)
-        data = {atr: request.data[atr] for atr in request.data}
-        for atr in data:
-            setattr(post, atr, data[atr])
-        post.save()
+    def put(self, request, *args):
+        # post = Blog.objects.get_blog(id)
+        # data = {atr: request.data[atr] for atr in request.data}
+        # for atr in data:
+        #     setattr(post, atr, data[atr])
+        # post.save()
+        Blog.objects.update_post(args[0])
         return HttpResponseRedirect(reverse('blog:show', args=[id]))
 
-    def delete(self, request, id):
-        self.get_blog(id).delete()
+    def delete(self, request, *args):
+        Blog.objects.delete_post(args[0])
+        # Blog.objects.get_blog(id).delete()
         return HttpResponseRedirect('/blogs')

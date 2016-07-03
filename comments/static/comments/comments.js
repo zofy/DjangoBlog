@@ -3,10 +3,12 @@
  */
 var index = {};
 
+var ajax = {};
+
 
 index.setUp = function () {
-    index.nextPage();
-    index.previousPage();
+    index.movePage();
+    index.vote();
 }
 
 index.getPage = function () {
@@ -14,15 +16,10 @@ index.getPage = function () {
     return uriList.filter(i => i !== "").splice(-1);
 }
 
-index.nextPage = function(){
-    $('#next').click(function () {
-        index.redirect(1);
-    });
-}
-
-index.previousPage = function(){
-    $('#prev').click(function () {
-        index.redirect(-1);
+index.movePage = function(event){
+    $('#prev, #next').on('click', function(){
+        if($(this).is('#next')) index.redirect(1);
+        if($(this).is('#prev')) index.redirect(-1);
     });
 }
 
@@ -35,6 +32,26 @@ index. redirect = function(direction){
         console.log('Bad page in URI!');
         alert('Bad page in URI!');
     }
+}
+
+index.vote = function(){
+    var id = $('#up').parent().parent().attr('id');
+    $('#up, #down').on('click', function(){
+        alert('Voting!');
+        if($(this).is('#up')) ajax.vote(id, {'up_votes': 1});
+        if($(this).is('#down')) ajax.vote(id, {'down_votes': 1});
+    });
+}
+
+ajax.vote = function(id, data){
+    $.ajax({
+        type: 'POST',
+        url: '/comments/' + id + '/',
+        data: data,
+        //data: {'player': $('#search').val(), 'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()},
+        success: alert('Success!'),
+        dataType: 'json'
+    });
 }
 
 index.setUp();

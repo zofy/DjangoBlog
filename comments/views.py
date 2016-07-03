@@ -31,10 +31,10 @@ class ShowView(APIView):
         # return Response({'comment': CommentSerializer(self.get_comment(id)).data}, template_name='comments/show.html')
         return Response(CommentSerializer(Comment.objects.get_comment(kwargs['id'])).data)
 
-    def put(self, request, **kwargs):
+    def put(self, request, *args):
         data = {atr: request.data[atr] for atr in request.data}
-        Comment.objects.update_comment(kwargs['id'], data)
-        return HttpResponseRedirect(reverse('comments:show', args=[kwargs['id']]))
+        Comment.objects.update_comment(args[0], data)
+        return HttpResponseRedirect(reverse('comments:show', args=[args[0]]))
 
     def delete(self, request, *args):
         Comment.objects.delete_comment(args[0])
