@@ -37,21 +37,15 @@ class IndexView(APIView):
 
 
 class ShowView(APIView):
-
     def get(self, request, **kwargs):
-        # return render(request, 'blog/show.html', {'blog': Blog.objects.get_blog(id)})
-        return Response({'blog': BlogSerializer(self.get_blog(kwargs['id'])).data}, template_name='blog/show.html')
+        return Response({'blog': BlogSerializer(Blog.objects.get_blog(kwargs['id'])).data},
+                        template_name='blog/show.html')
 
     def put(self, request, *args):
-        # post = Blog.objects.get_blog(id)
-        # data = {atr: request.data[atr] for atr in request.data}
-        # for atr in data:
-        #     setattr(post, atr, data[atr])
-        # post.save()
-        Blog.objects.update_post(args[0])
-        return HttpResponseRedirect(reverse('blog:show', args=[id]))
+        data = {atr: request.data[atr] for atr in request.data}
+        Blog.objects.update_post(args[0], data)
+        return HttpResponseRedirect(reverse('blog:show', args=[args[0]]))
 
     def delete(self, request, *args):
         Blog.objects.delete_post(args[0])
-        # Blog.objects.get_blog(id).delete()
         return HttpResponseRedirect('/blogs')

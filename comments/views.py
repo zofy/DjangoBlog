@@ -1,5 +1,5 @@
 from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponseRedirect, HttpResponse
+from django.http import Http404, HttpResponseRedirect, HttpResponse, JsonResponse
 from django.shortcuts import render
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
@@ -31,11 +31,13 @@ class ShowView(APIView):
         # return Response({'comment': CommentSerializer(self.get_comment(id)).data}, template_name='comments/show.html')
         return Response(CommentSerializer(Comment.objects.get_comment(kwargs['id'])).data)
 
-    def put(self, request, *args):
+    def put(self, request, *args, **kwargs):
         data = {atr: request.data[atr] for atr in request.data}
-        Comment.objects.update_comment(args[0], data)
-        return HttpResponseRedirect(reverse('comments:show', args=[args[0]]))
+        Comment.objects.update_comment(kwargs['id'], data)
+        return JsonResponse({'up': Comment.objects.get_comment(kwargs['id']).up_votes,
+                             'down': Comment.objects.get_comment(kwargs['id']).down_votes})
+        # return HttpResponseRedirect(reverse('comments:show', args=[args[0]]))
 
-    def delete(self, request, *args):
-        Comment.objects.delete_comment(args[0])
+    def delete(self, request, *args, **kwargs):
+        Comment.objects.delete_comment(kwargs['id'])
         return HttpResponseRedirect('/blogs')

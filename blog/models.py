@@ -17,11 +17,14 @@ class BlogManager(models.Manager):
     def create_post(self, data):
         Blog.objects.create(**data).save()
 
-    def update_post(self, id):
-        pass
+    def update_post(self, id, data):
+        post = self.get_blog(id)
+        for atr in data:
+            setattr(post, atr, data[atr])
+        post.save()
 
     def delete_post(self, id):
-        pass
+        self.get_blog(id).delete()
 
 
 class Blog(models.Model):

@@ -35,9 +35,9 @@ index. redirect = function(direction){
 }
 
 index.vote = function(){
-    var id = $('#up').parent().parent().attr('id');
     $('#up, #down').on('click', function(){
         alert('Voting!');
+        var id = $(this).parent().parent().attr('id');
         if($(this).is('#up')) ajax.vote(id, {'up_votes': 1});
         if($(this).is('#down')) ajax.vote(id, {'down_votes': 1});
     });
@@ -45,11 +45,11 @@ index.vote = function(){
 
 ajax.vote = function(id, data){
     $.ajax({
-        type: 'POST',
+        type: 'PUT',
         url: '/comments/' + id + '/',
         data: data,
         //data: {'player': $('#search').val(), 'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()},
-        success: alert('Success!'),
+        success: function(json){alert('up: ' + json['up'] + '\n' + 'down: ' + json['down'])},
         dataType: 'json'
     });
 }

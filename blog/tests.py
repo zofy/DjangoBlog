@@ -32,7 +32,8 @@ class BlogTestCase(APITestCase):
         url = reverse('blog:show', args=[b.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()['title'], 'Post1')
+        print response.json()
+        self.assertEqual(response.json()['blog']['title'], 'Post1')
 
     def test_show_put(self):
         b = self.create_post()
