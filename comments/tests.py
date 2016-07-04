@@ -3,6 +3,7 @@ from random import choice, randint
 from django.core.urlresolvers import reverse
 from rest_framework.test import APITestCase, APIRequestFactory
 from comments.models import Comment
+from comments.sorters import CommentSorter
 from comments.views import ShowView
 
 
@@ -23,9 +24,9 @@ class CommentTestCase(APITestCase):
             comments.append(c)
 
     def test_sorting(self):
-        self.generate_comments(10000)
-        self.assertEquals(Comment.objects.count(), 10000)
-        Comment.objects.all().order_by('path')
+        self.generate_comments(100)
+        self.assertEquals(Comment.objects.count(), 100)
+        # comments = Comment.objects.all().order_by('path')
         # for c in Comment.objects.all():
         #     print(c.path)
         # print('************')

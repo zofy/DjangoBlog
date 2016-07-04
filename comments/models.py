@@ -1,5 +1,7 @@
 from django.db import models
 
+from comments.sorters import CommentSorter
+
 
 class CommentManager(models.Manager):
     def get_comment(self, id):
@@ -80,6 +82,10 @@ class Comment(models.Model):
 
     @lower_bound.setter
     def lower_bound(self, value):
+        self.set_lower_bound()
+        # CommentSorter.update_sort(self.id)
+
+    def set_lower_bound(self):
         n = self.up_votes + self.down_votes
         if n == 0:
             return 0
@@ -87,4 +93,4 @@ class Comment(models.Model):
         z = 1.96
         phat = 1.0 * pos / n
         self._lower_bound = (phat + z * z / (2 * n) - z * ((phat * (1 - phat) + z * z / (4 * n)) / n)) / (
-                                                                                                         1 + z * z / n) ** 0.5
+                                                                                                             1 + z * z / n) ** 0.5
