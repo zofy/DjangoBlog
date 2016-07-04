@@ -8,7 +8,8 @@ from blog.views import ShowView
 class BlogTestCase(APITestCase):
     factory = APIRequestFactory()
 
-    def create_post(self, title='Post1', body='Some text'):
+    @staticmethod
+    def create_post(title='Post1', body='Some text'):
         return Blog.objects.create(title=title, body=body)
 
     def test_create_post(self):
@@ -32,7 +33,7 @@ class BlogTestCase(APITestCase):
         url = reverse('blog:show', args=[b.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        print response.json()
+        # print response.json()
         self.assertEqual(response.json()['blog']['title'], 'Post1')
 
     def test_show_put(self):

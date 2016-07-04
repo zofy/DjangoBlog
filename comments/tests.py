@@ -1,3 +1,5 @@
+from random import choice, randint
+
 from django.core.urlresolvers import reverse
 from rest_framework.test import APITestCase, APIRequestFactory
 from comments.models import Comment
@@ -7,11 +9,39 @@ from comments.views import ShowView
 class CommentTestCase(APITestCase):
     factory = APIRequestFactory()
 
-    def create_comment(self, blog_id=1, body='some text', depth=1):
-        return Comment.objects.create(blog_id=blog_id, body=body, depth=depth)
+    @staticmethod
+    def generate_comments(num):
+        comments = [CommentTestCase.create_comment()]
+        for __ in range(num - 1):
+            idx = randint(0, int(2 * len(comments)))
+            c = CommentTestCase.create_comment()
+            if idx < len(comments):
+                parent = comments[idx]
+                c.depth = parent.depth + 1
+                c.path = parent.path + ' ' + str(c.id)
+            c.save()
+            comments.append(c)
+
+    def test_sorting(self):
+        self.generate_comments(10000)
+        self.assertEquals(Comment.objects.count(), 10000)
+        Comment.objects.all().order_by('path')
+        # for c in Comment.objects.all():
+        #     print(c.path)
+        # print('************')
+        # for c in Comment.objects.all().order_by('path'):
+        #     print(c.path)
+
+    @staticmethod
+    def create_comment(blog_id=1, body='some text', depth=1):
+        c = Comment.objects.create(blog_id=blog_id, body=body, depth=depth)
+        c.path = str(c.id)
+        c.save()
+        return c
+        # return Comment.objects.create(blog_id=blog_id, body=body, depth=depth)
 
     def test_create_comment(self):
-        data = {'blog_id': 8, 'body': 'generated text', 'depth': 2 }
+        data = {'blog_id': 8, 'body': 'generated text', 'depth': 2}
         url = reverse('comments:index', args=[8, 0])
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 302)
