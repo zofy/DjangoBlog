@@ -24,14 +24,21 @@ class CommentTestCase(APITestCase):
             comments.append(c)
 
     def test_sorting(self):
-        self.generate_comments(100)
-        self.assertEquals(Comment.objects.count(), 100)
-        # comments = Comment.objects.all().order_by('path')
-        # for c in Comment.objects.all():
-        #     print(c.path)
-        # print('************')
-        # for c in Comment.objects.all().order_by('path'):
-        #     print(c.path)
+        self.generate_comments(10)
+        self.assertEquals(Comment.objects.count(), 10)
+        comments = Comment.objects.get_blog_comments(1)
+        # comments[3].up_votes = 1
+        comments[3]._lower_bound = -1
+        # c = CommentSorter.update_sort(comments[3], comments)
+        # print(c)
+        # for c in comments[:3]:
+        #     c.up_votes = 1
+        # comments[3].up_votes = 1
+        # comments[4].down_votes = 1
+        # print(CommentSorter.update_sort(comments[3], comments))
+        print(CommentSorter.to_change(comments[3], comments))
+        for c in comments:
+            print(c.path + ': ' + str(c.lower_bound) + ', ' + str(c.depth))
 
     @staticmethod
     def create_comment(blog_id=1, body='some text', depth=1):

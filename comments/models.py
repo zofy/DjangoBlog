@@ -12,7 +12,8 @@ class CommentManager(models.Manager):
 
     def get_blog_comments(self, blog_id):
         try:
-            return Comment.objects.filter(blog_id=blog_id).order_by('path')
+            # return Comment.objects.filter(blog_id=blog_id).order_by('path')
+            return sorted(Comment.objects.filter(blog_id=blog_id), key=lambda c: [int(n) for n in c.path.split()])
         except:
             return []
 
@@ -47,7 +48,7 @@ class CommentManager(models.Manager):
 
 class Comment(models.Model):
     body = models.TextField()
-    _up_votes = models.PositiveIntegerField(default=0)
+    _up_votes = models.PositiveIntegerField(default=1)
     _down_votes = models.PositiveIntegerField(default=0)
     _lower_bound = models.FloatField(default=0)
     depth = models.PositiveIntegerField(default=0)
@@ -83,7 +84,8 @@ class Comment(models.Model):
     @lower_bound.setter
     def lower_bound(self, value):
         self.set_lower_bound()
-        # CommentSorter.update_sort(self.id)
+
+        # CommentSorter.update_sort(self, Comment.objects.get_blog_comments(self.blog_id))
 
     def set_lower_bound(self):
         n = self.up_votes + self.down_votes
