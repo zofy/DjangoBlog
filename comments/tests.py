@@ -14,7 +14,7 @@ class CommentTestCase(APITestCase):
     def generate_comments(num):
         comments = [CommentTestCase.create_comment()]
         for __ in range(num - 1):
-            idx = randint(0, int(2 * len(comments)))
+            idx = randint(0, int(1.2 * len(comments)))
             c = CommentTestCase.create_comment()
             if idx < len(comments):
                 parent = comments[idx]
@@ -27,21 +27,16 @@ class CommentTestCase(APITestCase):
         self.generate_comments(10)
         self.assertEquals(Comment.objects.count(), 10)
         comments = Comment.objects.get_blog_comments(1)
-        # comments[3].up_votes = 1
         comments[3]._lower_bound = -1
-        # c = CommentSorter.update_sort(comments[3], comments)
-        # print(c)
-        # for c in comments[:3]:
-        #     c.up_votes = 1
-        # comments[3].up_votes = 1
-        # comments[4].down_votes = 1
-        # print(CommentSorter.update_sort(comments[3], comments))
-        print(CommentSorter.to_change(comments[3], comments))
         for c in comments:
             print(c.path + ': ' + str(c.lower_bound) + ', ' + str(c.depth))
 
+        print '*******************'
+
+        CommentSorter.update_sort(comments[3], comments)
+
     @staticmethod
-    def create_comment(blog_id=1, body='some text', depth=1):
+    def create_comment(blog_id=1, body='some text', depth=0):
         c = Comment.objects.create(blog_id=blog_id, body=body, depth=depth)
         c.path = str(c.id)
         c.save()
