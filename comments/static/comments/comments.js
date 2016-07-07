@@ -48,8 +48,7 @@ ajax.vote = function(id, data){
         type: 'PUT',
         url: '/comments/' + id + '/',
         data: data,
-        //data: {'player': $('#search').val(), 'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()},
-        success: function(json){alert('up: ' + json['up'] + '\n' + 'down: ' + json['down'])},
+        success: function(json){alert('up: ' + json['up'] + '\n' + 'down: ' + json['down'] + '\n' + 'lb: ' + json['lb']); document.location.reload(true)},
         dataType: 'json'
     });
 }

@@ -18,7 +18,6 @@ class CommentSorter(object):
 
         if len(upper) != 0 and len(lower) != 0:
             raise Exception('Wrongly sorted comments!')
-
         return max(upper, lower, key=len)
 
     @staticmethod
@@ -32,7 +31,6 @@ class CommentSorter(object):
     def change_childrens_path(me, children):
         for ch in children:
             ch.path = me.path + ' ' + ' '.join(ch.path.split()[me.depth + 1:])
-            print ch.path
             ch.save()
 
     @classmethod

@@ -84,8 +84,7 @@ class Comment(models.Model):
     @lower_bound.setter
     def lower_bound(self, value):
         self.set_lower_bound()
-
-        # CommentSorter.update_sort(self, Comment.objects.get_blog_comments(self.blog_id))
+        CommentSorter.update_sort(self, Comment.objects.get_blog_comments(self.blog_id))
 
     def set_lower_bound(self):
         n = self.up_votes + self.down_votes

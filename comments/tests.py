@@ -23,25 +23,38 @@ class CommentTestCase(APITestCase):
             c.save()
             comments.append(c)
 
-    def test_sorting(self):
-        self.generate_comments(10)
-        self.assertEquals(Comment.objects.count(), 10)
-        comments = Comment.objects.get_blog_comments(1)
-        comments[3]._lower_bound = -1
-        for c in comments:
-            print(c.path + ': ' + str(c.lower_bound) + ', ' + str(c.depth))
-
-        print '*******************'
-
-        CommentSorter.update_sort(comments[3], comments)
-
     @staticmethod
     def create_comment(blog_id=1, body='some text', depth=0):
         c = Comment.objects.create(blog_id=blog_id, body=body, depth=depth)
         c.path = str(c.id)
         c.save()
         return c
-        # return Comment.objects.create(blog_id=blog_id, body=body, depth=depth)
+
+    def test_voting(self):
+        c = self.create_comment()
+        c.up_votes = 1
+        c.down_votes = 1
+        c.save()
+        self.assertEquals(Comment.objects.get().up_votes, 2)
+        self.assertEquals(Comment.objects.get().down_votes, 1)
+        self.assertNotEquals(Comment.objects.get().lower_bound, 0)
+
+    def test_sorting(self):
+        self.generate_comments(10)
+        self.assertEquals(Comment.objects.count(), 10)
+        comments = Comment.objects.get_blog_comments(1)
+        comments[0]._lower_bound = -1
+        comments[0].save()
+        for c in comments:
+            print(c.path + ': ' + str(c.lower_bound) + ', ' + str(c.depth) + '   *   ' + str(c.id))
+
+        print('*******************')
+
+        CommentSorter.update_sort(comments[0], comments)
+        comments = Comment.objects.get_blog_comments(1)
+
+        for c in comments:
+            print(c.path + ': ' + str(c.lower_bound) + ', ' + str(c.depth) + '   *   ' + str(c.id))
 
     def test_create_comment(self):
         data = {'blog_id': 8, 'body': 'generated text', 'depth': 2}

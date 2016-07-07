@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     {% load staticfiles %}
     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
-    <link rel='stylesheet' href= "https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+    <link rel='stylesheet' href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
     <link rel="stylesheet" href="{% static 'comments/index.css' %}"/>
     <script
             src="https://code.jquery.com/jquery-1.12.4.min.js"
@@ -22,10 +22,14 @@
             <p class="poster">Anonymous - {{ c.date }}</p>
             {% if not c.hidden %}
             <p>{{ c.body }}</p>
+            <p>Lower bound is: {{ c.lower_bound }}</p>
             {% else %}
             <p>This comment has been hidden</p>
             {% endif %}
-            <p><i id="up" class="fa fa-chevron-up" aria-hidden="true"></i><i id="down" class="fa fa-chevron-down" aria-hidden="true"></i>
+            <p><i id="up" class="fa fa-chevron-up" aria-hidden="true">{{ c.up_votes }}</i><i id="down"
+                                                                                             class="fa fa-chevron-down"
+                                                                                             aria-hidden="true">{{
+                c.down_votes }}</i>
                 <a class="reply">reply</a></p>
         </li>
         {% empty %}
