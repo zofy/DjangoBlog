@@ -1,5 +1,6 @@
 from random import choice, randint
 
+import time
 from django.core.urlresolvers import reverse
 from rest_framework.test import APITestCase, APIRequestFactory
 from comments.models import Comment
@@ -24,21 +25,27 @@ class CommentTestCase(APITestCase):
             comments.append(c)
 
     def test_sorting(self):
-        self.generate_comments(10)
-        self.assertEquals(Comment.objects.count(), 10)
+        self.generate_comments(10000)
         comments = Comment.objects.get_blog_comments(1)
-        comments[3]._lower_bound = -1
-        for c in comments:
-            print(c.path + ': ' + str(c.lower_bound) + ', ' + str(c.depth))
+        comments[0].down_votes = 1
+        comments[0].save()
+        # for c in comments:
+        #     print(c.path + ': ' + str(c.lower_bound) + ', ' + str(c.depth))
 
         print '*******************'
+        CommentSorter.update_sort(comments[0], comments)
+        # print()
 
-        CommentSorter.update_sort(comments[3], comments)
+        # for c in Comment.objects.get_blog_comments(1):
+        #     print(c.path + ': ' + str(c.lower_bound) + ', ' + str(c.depth))
+
+
 
     @staticmethod
     def create_comment(blog_id=1, body='some text', depth=0):
         c = Comment.objects.create(blog_id=blog_id, body=body, depth=depth)
         c.path = str(c.id)
+        c.set_lower_bound()
         c.save()
         return c
         # return Comment.objects.create(blog_id=blog_id, body=body, depth=depth)

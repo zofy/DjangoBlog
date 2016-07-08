@@ -1,4 +1,6 @@
 import itertools
+# from comments.models import Comment
+import time
 
 
 class CommentSorter(object):
@@ -19,33 +21,35 @@ class CommentSorter(object):
         if len(upper) != 0 and len(lower) != 0:
             raise Exception('Wrongly sorted comments!')
 
-        return max(upper, lower, key=len)
+        return [me] + max(upper, lower, key=len)
 
     @staticmethod
-    def get_children(id, comments):
+    def change_path(path, depth, line):
+        for c in line:
+            pass
+            # c.path = path + ' ' + ' '.join(c.path.split()[depth + 1:])
+            # c.save()
+
+    @staticmethod
+    def get_line(comments_to_change, comments):
         for i, c in enumerate(comments):
-            if c.id == id:
-                break
-        return [comment for comment in itertools.takewhile(lambda c: c.path.startswith(comments[i].path), comments[i:])]
-
-    @staticmethod
-    def change_childrens_path(me, children):
-        for ch in children:
-            ch.path = me.path + ' ' + ' '.join(ch.path.split()[me.depth + 1:])
-            print ch.path
-            ch.save()
-
-    @classmethod
-    def sort(cls, comments):
-        pass
+            if c in comments_to_change:
+                yield [comment for comment in itertools.takewhile(lambda c: c.path.startswith(comments[i].path), comments[i:])]
 
     @classmethod
     def update_sort(cls, me, comments):
         comments_to_change = cls.to_change(me, cls.check_sorted(comments))
-        my_children = cls.get_children(me.id, comments)
-        for c in comments_to_change:
-            p = c.path
-            cls.change_childrens_path(me, cls.get_children(c.id, comments))
-            me.path = p
-        if len(comments_to_change) != 0:
-            cls.change_childrens_path(me, my_children)
+        # print([c.path for c in comments_to_change])
+        g = cls.get_line(comments_to_change, comments)
+        first = g.next()
+        # print([c.path for c in first])
+        p = first[0].path
+
+        start = time.time()
+        for line in cls.get_line(comments_to_change, comments):
+            last = line[0].path
+            cls.change_path(p, me.depth, line)
+            p = last
+
+        print(time.time() - start)
+        cls.change_path(p, me.depth, first)
