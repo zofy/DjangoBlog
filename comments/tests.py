@@ -1,5 +1,6 @@
 from random import choice, randint
 
+import time
 from django.core.urlresolvers import reverse
 from rest_framework.test import APITestCase, APIRequestFactory
 from comments.models import Comment
@@ -14,7 +15,7 @@ class CommentTestCase(APITestCase):
     def generate_comments(num):
         comments = [CommentTestCase.create_comment()]
         for __ in range(num - 1):
-            idx = randint(0, int(1.2 * len(comments)))
+            idx = randint(0, int(2 * len(comments)))
             c = CommentTestCase.create_comment()
             if idx < len(comments):
                 parent = comments[idx]
@@ -27,6 +28,7 @@ class CommentTestCase(APITestCase):
     def create_comment(blog_id=1, body='some text', depth=0):
         c = Comment.objects.create(blog_id=blog_id, body=body, depth=depth)
         c.path = str(c.id)
+        # c.set_lower_bound()
         c.save()
         return c
 
@@ -39,22 +41,33 @@ class CommentTestCase(APITestCase):
         self.assertEquals(Comment.objects.get().down_votes, 1)
         self.assertNotEquals(Comment.objects.get().lower_bound, 0)
 
+    def test_update(self):
+        self.generate_comments(100)
+        self.assertEquals(Comment.objects.count(), 100)
+        print('************')
+        start = time.time()
+        comments = Comment.objects.all()
+        for c in comments:
+            c.path = 'path'
+            c.save()
+        print(time.time() - start)
+
     def test_sorting(self):
         self.generate_comments(10)
         self.assertEquals(Comment.objects.count(), 10)
-        comments = Comment.objects.get_blog_comments(1)
-        comments[0]._lower_bound = -1
-        comments[0].save()
-        for c in comments:
-            print(c.path + ': ' + str(c.lower_bound) + ', ' + str(c.depth) + '   *   ' + str(c.id))
-
         print('*******************')
-
-        CommentSorter.update_sort(comments[0], comments)
         comments = Comment.objects.get_blog_comments(1)
 
         for c in comments:
             print(c.path + ': ' + str(c.lower_bound) + ', ' + str(c.depth) + '   *   ' + str(c.id))
+
+        comments[-1]._lower_bound = 1
+        comments[-1].save()
+
+        CommentSorter.update_sort(comments[-1], Comment.objects.get_blog_comments(1))
+        # comments[0].save()
+        # for c in Comment.objects.get_blog_comments(1):
+        #     print(c.path + ': ' + str(c.lower_bound) + ', ' + str(c.depth) + '   *   ' + str(c.id))
 
     def test_create_comment(self):
         data = {'blog_id': 8, 'body': 'generated text', 'depth': 2}
