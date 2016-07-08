@@ -36,7 +36,7 @@ index. redirect = function(direction){
 
 index.vote = function(){
     $('#up, #down').on('click', function(){
-        alert('Voting!');
+        console.log('Voting!');
         var id = $(this).parent().parent().attr('id');
         if($(this).is('#up')) ajax.vote(id, {'up_votes': 1});
         if($(this).is('#down')) ajax.vote(id, {'down_votes': 1});
@@ -48,8 +48,7 @@ ajax.vote = function(id, data){
         type: 'PUT',
         url: '/comments/' + id + '/',
         data: data,
-        //data: {'player': $('#search').val(), 'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()},
-        success: function(json){alert('up: ' + json['up'] + '\n' + 'down: ' + json['down'])},
+        success: function(json){console.log('up: ' + json['up'] + '\n' + 'down: ' + json['down'] + '\n' + 'lb: ' + json['lb']); document.location.reload(true)},
         dataType: 'json'
     });
 }
