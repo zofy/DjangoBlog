@@ -1,5 +1,4 @@
 import itertools
-import time
 
 from django.db import transaction
 
@@ -25,8 +24,6 @@ class CommentSorter(object):
             return upper[::-1] + [me], 0
         elif len(lower) != 0:
             return [me] + lower, 1
-
-            # return [me] + max(upper, lower, key=len)
 
     @staticmethod
     @transaction.atomic()
@@ -61,7 +58,6 @@ class CommentSorter(object):
 
         p = first[0].path
 
-        start = time.time()
         for line in g:
             last_path = line[0].path
             if res[1] == 0:
@@ -75,4 +71,3 @@ class CommentSorter(object):
             cls.change_path(p, me.depth, first)
         elif res[1] == 1:
             cls.change_path(p, me.depth, first)
-        print(time.time() - start)
