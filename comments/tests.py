@@ -25,20 +25,22 @@ class CommentTestCase(APITestCase):
             comments.append(c)
 
     def test_sorting(self):
-        self.generate_comments(10000)
+        self.generate_comments(10)
+        self.assertEqual(Comment.objects.count(), 10)
         comments = Comment.objects.get_blog_comments(1)
-        comments[0].down_votes = 1
-        comments[0].save()
-        # for c in comments:
-        #     print(c.path + ': ' + str(c.lower_bound) + ', ' + str(c.depth))
+        comments[-1].up_votes = 1
+        comments[-1].save()
+        print(len(comments))
+        for c in comments:
+            print(c.path + ': ' + str(c.lower_bound) + ', ' + str(c.depth))
 
         print '*******************'
-        CommentSorter.update_sort(comments[0], comments)
+        # CommentSorter.update_sort(comments[-1], comments)
         # print()
 
         # for c in Comment.objects.get_blog_comments(1):
         #     print(c.path + ': ' + str(c.lower_bound) + ', ' + str(c.depth))
-
+    #
 
 
     @staticmethod
