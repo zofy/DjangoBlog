@@ -1,9 +1,7 @@
 import itertools
 import time
 
-from django.db.models import F
-
-from comments.models import Comment
+from django.db import transaction
 
 
 class CommentSorter(object):
@@ -31,15 +29,11 @@ class CommentSorter(object):
             # return [me] + max(upper, lower, key=len)
 
     @staticmethod
-    def change_path(p, depth, line):
-        line.update(path=str(p) + ' ' + ' '.join(str(F('path')).split()[depth + 1:]))
-        # qs = Comment.objects.filter(id__in=[c.id for c in line])
-        # qs.update(path=str(p) + ' ' + ' '.join(str(F('path')).split()[depth + 1:]))
-        # qs.update(path=p + ' '.join(str(F('path')).split()[depth + 1:]))
-        # for c in line:
-        #     pass
-        #     c.path = path + ' ' + ' '.join(c.path.split()[depth + 1:])
-        #     c.save()
+    @transaction.atomic()
+    def change_path(path, depth, line):
+        for c in line:
+            c.path = path + ' ' + ' '.join(c.path.split()[depth + 1:])
+            c.save()
 
     @staticmethod
     def get_line(comments_to_change, comments):
@@ -61,7 +55,6 @@ class CommentSorter(object):
         if res is None:
             return
         comments_to_change = res[0]
-        # print([c.path for c in comments_to_change])
 
         g = cls.get_line(comments_to_change, comments)
         first = g.next()
