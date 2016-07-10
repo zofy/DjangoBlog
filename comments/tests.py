@@ -2,6 +2,7 @@ from random import choice, randint
 
 import time
 from django.core.urlresolvers import reverse
+from django.db import transaction
 from rest_framework.test import APITestCase, APIRequestFactory
 
 from comments.context_manager import time_this
@@ -14,6 +15,7 @@ class CommentTestCase(APITestCase):
     factory = APIRequestFactory()
 
     @staticmethod
+    @transaction.atomic()
     def generate_comments(num):
         comments = [CommentTestCase.create_comment()]
         for __ in range(num - 1):
@@ -27,23 +29,24 @@ class CommentTestCase(APITestCase):
             comments.append(c)
 
     def test_sorting(self):
-        self.generate_comments(10)
+        self.generate_comments(10000)
 
         # self.assertEqual(Comment.objects.count(), 1000)
-        comments = Comment.objects.get_blog_comments(1)
-        comments[-1].up_votes = 1
-        comments[-1].save()
-        for c in comments:
-            print(c.path + ': ' + str(c.lower_bound) + ', ' + str(c.depth))
+        with time_this('Fetching'):
+            comments = Comment.objects.get_blog_comments(1)
+        # comments[-1].up_votes = 1
+        # comments[-1].save()
+        # for c in comments:
+        #     print(c.path + ': ' + str(c.lower_bound) + ', ' + str(c.depth))
 
         print '*******************'
-        with time_this('Updating'):
-            CommentSorter.update_sort(comments[-1], comments)
+        # with time_this('Updating'):
+        #     CommentSorter.update_sort(comments[-1], comments)
 
-        print(CommentSorter.check_sorted(Comment.objects.get_blog_comments(1)))
+        # print(CommentSorter.check_sorted(Comment.objects.get_blog_comments(1)))
 
-        for c in Comment.objects.get_blog_comments(1):
-            print(c.path + ': ' + str(c.lower_bound) + ', ' + str(c.depth))
+        # for c in Comment.objects.get_blog_comments(1):
+        #     print(c.path + ': ' + str(c.lower_bound) + ', ' + str(c.depth))
 
     @staticmethod
     def create_comment(blog_id=1, body='some text', depth=0):

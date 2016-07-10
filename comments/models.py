@@ -12,7 +12,7 @@ class CommentManager(models.Manager):
 
     def get_blog_comments(self, blog_id):
         try:
-            return sorted(Comment.objects.filter(blog_id=blog_id), key=lambda c: [int(n) for n in c.path.split()])
+            return sorted(Comment.objects.filter(blog_id=blog_id), key=lambda c: [float(n) for n in c.path.split()])
         except:
             return []
 
