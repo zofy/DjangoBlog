@@ -3,6 +3,8 @@ from random import choice, randint
 import time
 from django.core.urlresolvers import reverse
 from rest_framework.test import APITestCase, APIRequestFactory
+
+from comments.context_manager import time_this
 from comments.models import Comment
 from comments.sorters import CommentSorter
 from comments.views import ShowView
@@ -27,8 +29,6 @@ class CommentTestCase(APITestCase):
     def test_sorting(self):
         self.generate_comments(10)
 
-        Comment.objects.get_blog_comments(1)
-
         # self.assertEqual(Comment.objects.count(), 1000)
         comments = Comment.objects.get_blog_comments(1)
         comments[-1].up_votes = 1
@@ -37,7 +37,10 @@ class CommentTestCase(APITestCase):
             print(c.path + ': ' + str(c.lower_bound) + ', ' + str(c.depth))
 
         print '*******************'
-        CommentSorter.update_sort(comments[-1], comments)
+        with time_this('Updating'):
+            CommentSorter.update_sort(comments[-1], comments)
+
+        print(CommentSorter.check_sorted(Comment.objects.get_blog_comments(1)))
 
         for c in Comment.objects.get_blog_comments(1):
             print(c.path + ': ' + str(c.lower_bound) + ', ' + str(c.depth))

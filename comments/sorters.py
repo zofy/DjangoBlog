@@ -7,9 +7,11 @@ class CommentSorter(object):
     @staticmethod
     def check_sorted(comments):
         for i, c in enumerate(comments[1:]):
-            if comments[i].path > c.path:
-                return sorted(comments, key=lambda c: [int(x) for x in c.path.split()])
-        return comments
+            if [int(x) for x in comments[i].path.split()] > [int(x) for x in c.path.split()]:
+                return False
+                # return sorted(comments, key=lambda c: [int(x) for x in c.path.split()])
+        # return comments
+        return True
 
     @staticmethod
     def to_change(me, comments):
@@ -48,10 +50,12 @@ class CommentSorter(object):
 
     @classmethod
     def update_sort(cls, me, comments):
-        res = cls.to_change(me, cls.check_sorted(comments))
+        # res = cls.to_change(me, cls.check_sorted(comments))
+        res = cls.to_change(me, comments)
         if res is None:
             return
         comments_to_change = res[0]
+        # print(comments_to_change)
 
         g = cls.get_line(comments_to_change, comments)
         first = g.next()
