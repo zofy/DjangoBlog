@@ -41,13 +41,13 @@ class CommentManager(models.Manager):
     @transaction.atomic()
     def update_comment(self, id, data):
         comment = self.get_comment(id)
-        # if 'up_votes' in data:
-        #     comment.up_votes = 1
-        # elif 'down_votes' in data:
-        #     comment.down_votes = 1
         for atr in data:
             setattr(comment, atr, data[atr])
         comment.save()
+        if 'up_votes' in data or 'down_votes' in data:
+            thread = sorted(Comment.objects.filter(path__startswith=comment.path).iterator(),
+                            key=lambda c: [float(n) for n in c.path.split()])
+            self.update_comment_thread(comment, thread)
 
     @transaction.atomic()
     def update_comment_thread(self, me, thread):
@@ -100,11 +100,9 @@ class Comment(models.Model):
 
     @lower_bound.setter
     def lower_bound(self, value):
+        # comments = sorted(Comment.objects.filter(path__startswith=self.path).iterator(),
+        #                   key=lambda c: [float(n) for n in c.path.split()])
         self.set_lower_bound()
-        self.save()
-        comments = sorted(Comment.objects.filter(path__startswith=self.path).iterator(),
-                          key=lambda c: [float(n) for n in c.path.split()])
-        Comment.objects.update_comment_thread(self, comments)
 
     def set_lower_bound(self):
         n = self.up_votes + self.down_votes

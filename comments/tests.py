@@ -38,20 +38,26 @@ class CommentTestCase(APITestCase):
         return c
 
     def test_sorting(self):
-        self.generate_comments(10)
+        first = Comment.objects.create_comment(1, {'body': 'first'})
+        second = Comment.objects.create_comment(1, {'body': 'second'})
+        third = Comment.objects.create_comment(1, {'body': 'third', 'parent': 1})
+        fourth = Comment.objects.create_comment(1, {'body': 'fourth', 'parent': 1})
 
-        # self.assertEqual(Comment.objects.count(), 1000)
-        # with time_this('Fetching'):
+        comments =[first, second, third, fourth]
+
         comments = Comment.objects.get_blog_comments(1)
+
+        # with time_this('Updating'):
+        #     comments[0].down_votes = 1
+
+        Comment.objects.update_comment(2, {'up_votes': 1})
 
         for c in comments:
             print(c.path + ': ' + str(c.depth) + ' id: ' + str(c.id))
 
-        # with time_this('Updating'):
-        #     comments[0].down_votes = 1
         # comments[2].down_votes = 1
         # comments[0].down_votes = 1
-        Comment.objects.update_comment(1, {'down_votes': 1})
+        # Comment.objects.update_comment(1, {'down_votes': 1})
 
         print('*******************')
 
