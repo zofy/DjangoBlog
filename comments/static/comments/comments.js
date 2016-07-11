@@ -48,7 +48,7 @@ ajax.vote = function(id, data){
         type: 'PUT',
         url: '/comments/' + id + '/',
         data: data,
-        success: function(json){alert('up: ' + json['up'] + '\n' + 'down: ' + json['down'] + '\n' + 'lb: ' + json['lb']); document.location.reload(true)},
+        success: function(json){alert('up: ' + json['up'] + '\n' + 'down: ' + json['down'] + '\n' + 'path: ' + json['path']); document.location.reload(true)},
         dataType: 'json'
     });
 }

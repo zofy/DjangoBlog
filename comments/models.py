@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db import models
 
 from comments.updater import CommentUpdater
@@ -22,10 +23,12 @@ class CommentManager(models.Manager):
         except:
             raise Exception('Parent comment not found!')
 
+    @transaction.atomic()
     def create_comment(self, blog_id, data):
         if 'parent' in data:
             parent_comment = self.get_parent_comment(data['parent'])
             data['path'] = parent_comment.path
+            data['depth'] = parent_comment.depth + 1
         data['blog_id'] = blog_id
         c = Comment.objects.create(**data)
         c.save()
@@ -35,11 +38,26 @@ class CommentManager(models.Manager):
         c.path = ' '.join([c.path, str(-c.lower_bound), str(c.id)])
         c.save()
 
+    @transaction.atomic()
     def update_comment(self, id, data):
         comment = self.get_comment(id)
+        # if 'up_votes' in data:
+        #     comment.up_votes = 1
+        # elif 'down_votes' in data:
+        #     comment.down_votes = 1
         for atr in data:
             setattr(comment, atr, data[atr])
         comment.save()
+
+    @transaction.atomic()
+    def update_comment_thread(self, me, thread):
+        lb, depth, my_path_list = me.lower_bound, me.depth, me.path.split()
+        for c in thread:
+            path_list = c.path.split()
+            if path_list[:len(my_path_list)] != my_path_list:
+                continue
+            c.path = ' '.join(path_list[:depth * 2] + [str(-lb)] + path_list[depth * 2 + 1:])
+            c.save()
 
     def delete_comment(self, id):
         self.get_comment(id).delete()
@@ -83,8 +101,10 @@ class Comment(models.Model):
     @lower_bound.setter
     def lower_bound(self, value):
         self.set_lower_bound()
-        # sorted(Comment.objects.filter(path_=), key=lambda c: [float(n) for n in c.path.split()])
-        CommentUpdater().update_line(self, Comment.objects.get_blog_comments(self.blog_id))
+        self.save()
+        comments = sorted(Comment.objects.filter(path__startswith=self.path).iterator(),
+                          key=lambda c: [float(n) for n in c.path.split()])
+        Comment.objects.update_comment_thread(self, comments)
 
     def set_lower_bound(self):
         n = self.up_votes + self.down_votes

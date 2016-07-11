@@ -35,7 +35,8 @@ class ShowView(APIView):
         # Comment.objects.update_comment(args[0], data)
         return JsonResponse({'up': Comment.objects.get_comment(kwargs['id']).up_votes,
                              'down': Comment.objects.get_comment(kwargs['id']).down_votes,
-                             'lb': Comment.objects.get_comment(kwargs['id']).lower_bound})
+                             'lb': Comment.objects.get_comment(kwargs['id']).lower_bound,
+                             'path': Comment.objects.get_comment(kwargs['id']).path})
 
 
     def delete(self, request, *args, **kwargs):

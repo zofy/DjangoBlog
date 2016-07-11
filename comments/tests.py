@@ -38,20 +38,26 @@ class CommentTestCase(APITestCase):
         return c
 
     def test_sorting(self):
-        self.generate_comments(10000)
+        self.generate_comments(10)
 
         # self.assertEqual(Comment.objects.count(), 1000)
         # with time_this('Fetching'):
         comments = Comment.objects.get_blog_comments(1)
-        with time_this('Updating'):
-            comments[-1].up_votes = 1
-        # comments[0].save()
-        # CommentUpdater().update_line(comments[0], comments)
-        # for c in comments:
-        #     print(c.path + ': ' + str(c.depth))
-        # print('*******************')
-        # for c in Comment.objects.get_blog_comments(1):
-        #     print(c.path + ': ' + str(c.depth))
+
+        for c in comments:
+            print(c.path + ': ' + str(c.depth) + ' id: ' + str(c.id))
+
+        # with time_this('Updating'):
+        #     comments[0].down_votes = 1
+        # comments[2].down_votes = 1
+        # comments[0].down_votes = 1
+        Comment.objects.update_comment(1, {'down_votes': 1})
+
+        print('*******************')
+
+        for c in Comment.objects.get_blog_comments(1):
+            print(c.path + ': ' + str(c.depth) + ' id: ' + str(c.id))
+
         print(CommentSorter.check_sorted(Comment.objects.get_blog_comments(1)))
 
     def test_create_comment(self):
@@ -61,6 +67,14 @@ class CommentTestCase(APITestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Comment.objects.count(), 1)
         self.assertEqual(Comment.objects.get().blog_id, 8)
+        self.assertEqual(Comment.objects.get().depth, 2)
+        parent = Comment.objects.get().id
+        data = {'blog_id': 8, 'body': 'generated text', 'parent': parent}
+        url = reverse('comments:index', args=[8, 0])
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Comment.objects.get(id=2).depth, 3)
+        self.assertEqual(Comment.objects.get(id=2).parent, 1)
 
     def test_show_comments(self):
         c = self.create_comment()

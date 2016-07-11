@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     {% load staticfiles %}
-    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
     <link rel='stylesheet' href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.css">
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.js"></script>
     <link rel="stylesheet" href="{% static 'comments/index.css' %}"/>
     <script
             src="https://code.jquery.com/jquery-1.12.4.min.js"
@@ -13,32 +15,42 @@
     <title>ShowPage</title>
 </head>
 <body>
-{% csrf_token %}
-<h1>Commenting System</h1>
+
 <div class="container">
-    <ul id="comments_tree">
-        {% for c in comment_tree %}
+    <h1>Commenting System</h1>
+    <div class="ui form">
+        <div class="field">
+            <label>Comment</label>
+            <input type="text" placeholder="Join the discussion..">
+        </div>
+    </div>
+
+    {% csrf_token %}
+    <div id="tree" class="container">
+        <ul id="comments_tree">
+            {% for c in comment_tree %}
             <li id="{{ c.id }}" class="c" style="margin-left:{{ c.depth|add:c.depth }}em;">
                 <p class="poster">Anonymous - {{ c.date }}</p>
                 <p>{{ c.up_votes }}</p>
                 {% if not c.hidden %}
-                    <p>{{ c.body }}</p>
-                    <p>Lower bound is: {{ c.instance.lower_bound }}</p>
+                <p>{{ c.body }}</p>
+                <p>Lower bound is: {{ c.instance.lower_bound }}</p>
                 {% else %}
-                    <p>This comment has been hidden</p>
+                <p>This comment has been hidden</p>
                 {% endif %}
-                <p><i id="up" class="fa fa-chevron-up" aria-hidden="true"></i><i id="down"
+                <p><i id="up" class="fa fa-chevron-up" aria-hidden="true">|</i><i id="down"
                                                                                  class="fa fa-chevron-down"
                                                                                  aria-hidden="true"></i>
                     <a class="reply">reply</a></p>
             </li>
-        {% empty %}
+            {% empty %}
             <li>There are currently no comments. You can be first!</li>
-        {% endfor %}
-    </ul>
-    <span id="prev"><i class="fa fa-chevron-left" aria-hidden="true"></i> Previous</span>
+            {% endfor %}
+        </ul>
+        <span id="prev"><i class="fa fa-chevron-left" aria-hidden="true"></i> Previous</span>
     <span id="next">Next <i class="fa fa-chevron-right" aria-hidden="true"></i>
 </span>
+    </div>
 </div>
 <script type="text/javascript" src="{% static 'comments/comments.js' %}"></script>
 </body>
