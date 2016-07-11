@@ -45,6 +45,8 @@ class CommentManager(models.Manager):
             setattr(comment, atr, data[atr])
         comment.save()
         if 'up_votes' in data or 'down_votes' in data:
+            # with open('C://Users/Patrik/Desktop/log.txt', 'w+') as f:
+            #     f.write('huhuhu')
             thread = sorted(Comment.objects.filter(path__startswith=comment.path).iterator(),
                             key=lambda c: [float(n) for n in c.path.split()])
             self.update_comment_thread(comment, thread)
