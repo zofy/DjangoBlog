@@ -1,6 +1,6 @@
 from django.db import models
 
-from comments.sorters import CommentSorter
+from comments.updater import CommentUpdater
 
 
 class CommentManager(models.Manager):
@@ -29,10 +29,10 @@ class CommentManager(models.Manager):
         data['blog_id'] = blog_id
         c = Comment.objects.create(**data)
         c.save()
-        if c.path:
-            c.path += ' ' + str(c.id)
-        else:
-            c.path = str(c.id)
+        c.set_lower_bound()
+        if c.path is None:
+            c.path = ''
+        c.path = ' '.join([c.path, str(-c.lower_bound), str(c.id)])
         c.save()
 
     def update_comment(self, id, data):
@@ -83,7 +83,8 @@ class Comment(models.Model):
     @lower_bound.setter
     def lower_bound(self, value):
         self.set_lower_bound()
-        CommentSorter.update_sort(self, Comment.objects.get_blog_comments(self.blog_id))
+        # sorted(Comment.objects.filter(path_=), key=lambda c: [float(n) for n in c.path.split()])
+        CommentUpdater().update_line(self, Comment.objects.get_blog_comments(self.blog_id))
 
     def set_lower_bound(self):
         n = self.up_votes + self.down_votes

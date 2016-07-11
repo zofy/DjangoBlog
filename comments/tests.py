@@ -8,6 +8,7 @@ from rest_framework.test import APITestCase, APIRequestFactory
 from comments.context_manager import time_this
 from comments.models import Comment
 from comments.sorters import CommentSorter
+from comments.updater import CommentUpdater
 from comments.views import ShowView
 
 
@@ -24,38 +25,34 @@ class CommentTestCase(APITestCase):
             if idx < len(comments):
                 parent = comments[idx]
                 c.depth = parent.depth + 1
-                c.path = parent.path + ' ' + str(c.id)
+                c.path = parent.path + ' ' + c.path
             c.save()
             comments.append(c)
+
+    @staticmethod
+    def create_comment(blog_id=1, body='some text', depth=0):
+        c = Comment.objects.create(blog_id=blog_id, body=body, depth=depth)
+        c.set_lower_bound()
+        c.path = ' '.join([str(-c.lower_bound), str(c.id)])
+        c.save()
+        return c
 
     def test_sorting(self):
         self.generate_comments(10000)
 
         # self.assertEqual(Comment.objects.count(), 1000)
-        with time_this('Fetching'):
-            comments = Comment.objects.get_blog_comments(1)
-        # comments[-1].up_votes = 1
-        # comments[-1].save()
+        # with time_this('Fetching'):
+        comments = Comment.objects.get_blog_comments(1)
+        with time_this('Updating'):
+            comments[-1].up_votes = 1
+        # comments[0].save()
+        # CommentUpdater().update_line(comments[0], comments)
         # for c in comments:
-        #     print(c.path + ': ' + str(c.lower_bound) + ', ' + str(c.depth))
-
-        print '*******************'
-        # with time_this('Updating'):
-        #     CommentSorter.update_sort(comments[-1], comments)
-
-        # print(CommentSorter.check_sorted(Comment.objects.get_blog_comments(1)))
-
+        #     print(c.path + ': ' + str(c.depth))
+        # print('*******************')
         # for c in Comment.objects.get_blog_comments(1):
-        #     print(c.path + ': ' + str(c.lower_bound) + ', ' + str(c.depth))
-
-    @staticmethod
-    def create_comment(blog_id=1, body='some text', depth=0):
-        c = Comment.objects.create(blog_id=blog_id, body=body, depth=depth)
-        c.path = str(c.id)
-        c.set_lower_bound()
-        c.save()
-        return c
-        # return Comment.objects.create(blog_id=blog_id, body=body, depth=depth)
+        #     print(c.path + ': ' + str(c.depth))
+        print(CommentSorter.check_sorted(Comment.objects.get_blog_comments(1)))
 
     def test_create_comment(self):
         data = {'blog_id': 8, 'body': 'generated text', 'depth': 2}

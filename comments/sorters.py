@@ -7,7 +7,7 @@ class CommentSorter(object):
     @staticmethod
     def check_sorted(comments):
         for i, c in enumerate(comments[1:]):
-            if [int(x) for x in comments[i].path.split()] > [int(x) for x in c.path.split()]:
+            if [float(x) for x in comments[i].path.split()] > [float(x) for x in c.path.split()]:
                 return False
                 # return sorted(comments, key=lambda c: [int(x) for x in c.path.split()])
         # return comments
