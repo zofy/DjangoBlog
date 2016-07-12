@@ -20,7 +20,7 @@ class CommentTestCase(APITestCase):
     def generate_comments(num):
         comments = [CommentTestCase.create_comment()]
         for __ in range(num - 1):
-            idx = randint(0, int(1.2 * len(comments)))
+            idx = randint(0, int(1.5 * len(comments)))
             c = CommentTestCase.create_comment()
             if idx < len(comments):
                 parent = comments[idx]
@@ -38,22 +38,19 @@ class CommentTestCase(APITestCase):
         return c
 
     def test_sorting(self):
-        first = Comment.objects.create_comment(1, {'body': 'first'})
-        second = Comment.objects.create_comment(1, {'body': 'second'})
-        third = Comment.objects.create_comment(1, {'body': 'third', 'parent': 1})
-        fourth = Comment.objects.create_comment(1, {'body': 'fourth', 'parent': 1})
+        self.generate_comments(10)
 
-        comments =[first, second, third, fourth]
-
-        comments = Comment.objects.get_blog_comments(1)
+        with time_this('Fetching'):
+            comments = Comment.objects.get_blog_comments(1)
 
         # with time_this('Updating'):
         #     comments[0].down_votes = 1
 
-        Comment.objects.update_comment(2, {'up_votes': 1})
+        with time_this('Updating'):
+            Comment.objects.update_comment(1, {'down_votes': 1})
 
-        for c in comments:
-            print(c.path + ': ' + str(c.depth) + ' id: ' + str(c.id))
+        # for c in comments:
+        #     print(c.path + ': ' + str(c.depth) + ' id: ' + str(c.id))
 
         # comments[2].down_votes = 1
         # comments[0].down_votes = 1
@@ -61,8 +58,8 @@ class CommentTestCase(APITestCase):
 
         print('*******************')
 
-        for c in Comment.objects.get_blog_comments(1):
-            print(c.path + ': ' + str(c.depth) + ' id: ' + str(c.id))
+        # for c in Comment.objects.get_blog_comments(1):
+        #     print(c.path + ': ' + str(c.depth) + ' id: ' + str(c.id))
 
         print(CommentSorter.check_sorted(Comment.objects.get_blog_comments(1)))
 

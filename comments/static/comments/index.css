@@ -46,3 +46,11 @@ a {
 .fa:hover{
     color: #397098;
 }
+
+#newComment{
+    width:100%;
+    overflow: auto;
+    max-height: 150px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}

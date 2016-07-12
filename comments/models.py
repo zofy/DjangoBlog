@@ -1,8 +1,6 @@
 from django.db import transaction
 from django.db import models
 
-from comments.updater import CommentUpdater
-
 
 class CommentManager(models.Manager):
     def get_comment(self, id):
@@ -45,8 +43,6 @@ class CommentManager(models.Manager):
             setattr(comment, atr, data[atr])
         comment.save()
         if 'up_votes' in data or 'down_votes' in data:
-            # with open('C://Users/Patrik/Desktop/log.txt', 'w+') as f:
-            #     f.write('huhuhu')
             thread = sorted(Comment.objects.filter(path__startswith=comment.path).iterator(),
                             key=lambda c: [float(n) for n in c.path.split()])
             self.update_comment_thread(comment, thread)
@@ -102,8 +98,6 @@ class Comment(models.Model):
 
     @lower_bound.setter
     def lower_bound(self, value):
-        # comments = sorted(Comment.objects.filter(path__startswith=self.path).iterator(),
-        #                   key=lambda c: [float(n) for n in c.path.split()])
         self.set_lower_bound()
 
     def set_lower_bound(self):
