@@ -10,6 +10,7 @@ index.setUp = function () {
     index.movePage();
     index.vote();
     index.createComment();
+    index.reply();
 }
 
 index.getIdAndPage = function () {
@@ -44,11 +45,37 @@ index.vote = function(){
     });
 }
 
+index.getCommentPosition = function(li_id){
+    for(var i = 0; i < $('ul li').length; i++){
+        if(li_id === $($('ul li').get(i)).attr('id')) return i;
+    }
+    return null;
+}
+
 index.createComment = function(){
-    $('#newComment').keypress(function(event){
+    $('.container').on('keypress', '.newComment', function(event){
         if (event.which === 13){
-            alert('Creating a new comment!');
+            console.log('Creating a new comment!');
+            var idAndPage = index.getIdAndPage(), data = {'body': $(this).val()}, classList = this.classList;
+            if(classList.length === 2){
+                data['parent'] = classList[1];
+            }
+            ajax.createComment(idAndPage, data);
+            $(this).val('');
         }
+    });
+}
+
+index.reply = function(){
+    $('.reply').on('click', function(){
+        var parent = $(this).parent().parent();
+        var oldHtml = parent.html(), parent_id = $(parent).attr('id');
+        var newHtml = '<div class="ui form">' +
+                        '<div class="field">' +
+                            '<input class="newComment ' + parent_id + '" type="text" placeholder="Join the discussion..">' +
+                        '</div>' +
+                       '</div>';
+        $(this).parent().parent().html(oldHtml + newHtml);
     });
 }
 
@@ -58,6 +85,17 @@ ajax.vote = function(id, data){
         url: '/comments/' + id + '/',
         data: data,
         success: function(json){alert('up: ' + json['up'] + '\n' + 'down: ' + json['down'] + '\n' + 'path: ' + json['path']); document.location.reload(true)},
+        dataType: 'json'
+    });
+}
+
+ajax.createComment = function(idAndPage, data){
+    $.ajax({
+        type: 'POST',
+        url: '/' + idAndPage[0] + '/comments/' + idAndPage[1] + '/',
+        data: data,
+//        success: function(json){alert('Comment: ' + json['body'])},
+        success: location.reload(),
         dataType: 'json'
     });
 }

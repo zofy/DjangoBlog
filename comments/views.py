@@ -14,7 +14,7 @@ COMMENTS_PER_PAGE = 5
 class IndexView(APIView):
     def get(self, request, **kwargs):
         comments = Comment.objects.get_blog_comments(kwargs['blog_id'])[
-                   int(kwargs['page']) * COMMENTS_PER_PAGE: (int(kwargs['page']) + 1) + COMMENTS_PER_PAGE]
+                   int(kwargs['page']) * COMMENTS_PER_PAGE: (int(kwargs['page']) + 1) * COMMENTS_PER_PAGE]
         serializer = CommentSerializer(comments, many=True)
         return Response({'comment_tree': serializer.data}, template_name='comments/index.html')
 
@@ -22,7 +22,7 @@ class IndexView(APIView):
         # in data must be id of a parent_comment
         data = {atr: request.data[atr] for atr in request.data}
         Comment.objects.create_comment(kwargs['blog_id'], data)
-        return HttpResponseRedirect('/blogs')
+        return HttpResponseRedirect('/' + kwargs['blog_id'] + '/' + 'comments/' + kwargs['page'] + '/')
 
 
 class ShowView(APIView):

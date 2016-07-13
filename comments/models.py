@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import transaction
 from django.db import models
 
@@ -34,6 +36,7 @@ class CommentManager(models.Manager):
         if c.path is None:
             c.path = ''
         c.path = ' '.join([c.path, str(-c.lower_bound), str(c.id)])
+        c.date = datetime.datetime.now()
         c.save()
 
     @transaction.atomic()
@@ -71,6 +74,7 @@ class Comment(models.Model):
     parent = models.PositiveIntegerField(default=None, null=True)
     path = models.TextField(default=None, null=True)
     hidden = models.BooleanField(default=False)
+    date = models.DateTimeField(auto_now_add=True)
 
     objects = CommentManager()
 

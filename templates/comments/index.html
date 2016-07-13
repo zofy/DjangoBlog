@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load humanize %}
     <meta charset="UTF-8">
     {% load staticfiles %}
     <link rel='stylesheet' href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
@@ -21,16 +22,15 @@
     <div class="ui form">
         <div class="field">
             <label>Comment</label>
-            <input id="newComment" type="text" placeholder="Join the discussion..">
+            <input class="newComment" type="text" placeholder="Join the discussion..">
         </div>
     </div>
 
     {% csrf_token %}
-    <div id="tree" class="container">
         <ul id="comments_tree">
             {% for c in comment_tree %}
             <li id="{{ c.id }}" class="c" style="margin-left:{{ c.depth|add:c.depth }}em;">
-                <p class="poster">Anonymous - {{ c.date }}</p>
+                <p class="poster">Anonymous - {{ c.date|naturaltime }}</p>
                 <p>{{ c.up_votes }}</p>
                 {% if not c.hidden %}
                 <p>{{ c.body }}</p>
@@ -50,7 +50,6 @@
         <span id="prev"><i class="fa fa-chevron-left" aria-hidden="true"></i> Previous</span>
     <span id="next">Next <i class="fa fa-chevron-right" aria-hidden="true"></i>
 </span>
-    </div>
 </div>
 <script type="text/javascript" src="{% static 'comments/comments.js' %}"></script>
 </body>
