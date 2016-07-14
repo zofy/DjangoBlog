@@ -54,3 +54,7 @@ a {
     white-space: pre-wrap;
     word-wrap: break-word;
 }
+
+.hide{
+    visibility: hidden;
+}

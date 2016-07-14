@@ -67,7 +67,7 @@ index.createComment = function(){
 }
 
 index.reply = function(){
-    $('.reply').on('click', function(){
+    $('.reply').on('click',  function(){
         var parent = $(this).parent().parent();
         var oldHtml = parent.html(), parent_id = $(parent).attr('id');
         var newHtml = '<div class="ui form">' +
@@ -75,7 +75,9 @@ index.reply = function(){
                             '<input class="newComment ' + parent_id + '" type="text" placeholder="Join the discussion..">' +
                         '</div>' +
                        '</div>';
-        $(this).parent().parent().html(oldHtml + newHtml);
+        parent.html(oldHtml + newHtml);
+        console.log($('#' + parent_id + ' .ui.form'));
+        $('#' + parent_id + ' .ui.form').toggleClass('hide');
     });
 }
 
