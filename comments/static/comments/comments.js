@@ -26,10 +26,10 @@ index.movePage = function(event){
 }
 
 index. redirect = function(direction){
-    var curPage = index.getIdAndPage()[1];
+    var idAndPage = index.getIdAndPage(), domain = window.location.href.split('/').filter(i => i !== "")[1];
     try {
-        var page = parseInt(curPage);
-        window.location.href = 'http://127.0.0.1:8000/1/comments/' + (page + direction).toString() + '/';
+        var page = parseInt(idAndPage[1]);
+        window.location.href = 'http://' + domain + '/' + idAndPage[0] + '/comments/' + (page + direction).toString() + '/';
     } catch (e) {
         console.log('Bad page in URI!');
         alert('Bad page in URI!');

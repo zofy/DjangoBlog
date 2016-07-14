@@ -7,3 +7,9 @@ i.icon {
 #delete{
     display: inline;
 }
+
+#comments{
+    margin: auto;
+    width: 50%;
+    max-height: 30%;
+}

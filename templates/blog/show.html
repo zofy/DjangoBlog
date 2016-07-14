@@ -18,8 +18,8 @@
     </div>
 </div>
 
-<div class="container">
-    <iframe src="{% url 'comments:index' blog_id=1 page=0 %}" frameborder="0"></iframe>
+<div id="comments" class="container">
+    <iframe src="{% url 'comments:index' blog_id=blog.id page=0 %}" frameborder="0"></iframe>
 </div>
  <script>
     $(document).ready(function() {
