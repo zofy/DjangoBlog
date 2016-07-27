@@ -11,21 +11,22 @@ class CommentManager(models.Manager):
         except:
             raise Exception('Comment not found!')
 
-    def get_blog_comments(self, blog_id):
+    def best_comments(self, blog_id):
         try:
             return sorted(Comment.objects.filter(blog_id=blog_id), key=lambda c: [float(n) for n in c.path.split()])
         except:
             return []
 
-    def get_newest_comments(self, blog_id):
+    def newest_comments(self, blog_id):
         try:
-            return sorted(Comment.objects.filter(blog_id=blog_id), key=lambda c: [-int(n) for n in c.path2.split()])
+            return sorted(Comment.objects.filter(blog_id=blog_id),
+                          key=lambda c: [-int(n) for n in c.path.split()[1::2]])
         except:
             return []
 
-    def get_oldest_comments(self, blog_id):
+    def oldest_comments(self, blog_id):
         try:
-            return sorted(Comment.objects.filter(blog_id=blog_id), key=lambda c: [int(n) for n in c.path2.split()])
+            return sorted(Comment.objects.filter(blog_id=blog_id), key=lambda c: [int(n) for n in c.path.split()[1::2]])
         except:
             return []
 
@@ -40,16 +41,14 @@ class CommentManager(models.Manager):
         if 'parent' in data:
             parent_comment = self.get_parent_comment(data['parent'])
             data['path'] = parent_comment.path
-            data['path2'] = parent_comment.path2
             data['depth'] = parent_comment.depth + 1
         data['blog_id'] = blog_id
         c = Comment.objects.create(**data)
         c.save()
         c.set_lower_bound()
         if c.path is None:
-            c.path, c.apth2 = '', ''
+            c.path = ''
         c.path = ' '.join([c.path, str(-c.lower_bound), str(c.id)])
-        c.path2 = ' '.join([c.path2, str(c.id)])
         c.date = datetime.datetime.now()
         c.save()
 
@@ -87,7 +86,6 @@ class Comment(models.Model):
     blog_id = models.PositiveIntegerField(default=0)  # id of Blog Post
     parent = models.PositiveIntegerField(default=None, null=True)
     path = models.TextField(default=None, null=True)
-    path2 = models.TextField(default=None, null=True)
     hidden = models.BooleanField(default=False)
     date = models.DateTimeField(auto_now_add=True)
 
