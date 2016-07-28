@@ -5,36 +5,35 @@ from django.db import models
 
 
 class CommentManager(models.Manager):
-    def get_comment(self, id):
+    @staticmethod
+    def get_comment(id):
         try:
             return Comment.objects.get(id=id)
         except:
             raise Exception('Comment not found!')
 
-    def best_comments(self, blog_id):
-        try:
-            return sorted(Comment.objects.filter(blog_id=blog_id), key=lambda c: [float(n) for n in c.path.split()])
-        except:
-            return []
-
-    def newest_comments(self, blog_id):
-        try:
-            return sorted(Comment.objects.filter(blog_id=blog_id),
-                          key=lambda c: [-int(n) for n in c.path.split()[1::2]])
-        except:
-            return []
-
-    def oldest_comments(self, blog_id):
-        try:
-            return sorted(Comment.objects.filter(blog_id=blog_id), key=lambda c: [int(n) for n in c.path.split()[1::2]])
-        except:
-            return []
-
-    def get_parent_comment(self, parent_id):
+    @staticmethod
+    def get_parent_comment(parent_id):
         try:
             return Comment.objects.get(id=parent_id)
         except:
             raise Exception('Parent comment not found!')
+
+    @staticmethod
+    def get_blog_comments(blog_id):
+        try:
+            return Comment.objects.filter(blog_id=blog_id)
+        except:
+            return []
+
+    def best_comments(self, blog_id):
+        return sorted(self.get_blog_comments(blog_id), key=lambda c: [float(n) for n in c.path.split()])
+
+    def newest_comments(self, blog_id):
+        return sorted(self.get_blog_comments(blog_id), key=lambda c: [-int(n) for n in c.path.split()[1::2]])
+
+    def oldest_comments(self, blog_id):
+        return sorted(self.get_blog_comments(blog_id), key=lambda c: [int(n) for n in c.path.split()[1::2]])
 
     @transaction.atomic()
     def create_comment(self, blog_id, data):

@@ -12,8 +12,17 @@ COMMENTS_PER_PAGE = 5
 
 
 class IndexView(APIView):
+    @staticmethod
+    def get_comments(blog_id, sort_by):
+        if sort_by is None:
+            return Comment.objects.best_comments(blog_id)
+        elif sort_by == 'newest':
+            return Comment.objects.newest_comments(blog_id)
+        elif sort_by == 'oldest':
+            return Comment.objects.oldest_comments(blog_id)
+
     def get(self, request, **kwargs):
-        comments = Comment.objects.get_blog_comments(kwargs['blog_id'])[
+        comments = self.get_comments(request.data.get('sort_by'))[
                    int(kwargs['page']) * COMMENTS_PER_PAGE: (int(kwargs['page']) + 1) * COMMENTS_PER_PAGE]
         serializer = CommentSerializer(comments, many=True)
         return Response({'comment_tree': serializer.data}, template_name='comments/index.html')
@@ -37,7 +46,6 @@ class ShowView(APIView):
                              'down': Comment.objects.get_comment(kwargs['id']).down_votes,
                              'lb': Comment.objects.get_comment(kwargs['id']).lower_bound,
                              'path': Comment.objects.get_comment(kwargs['id']).path})
-
 
     def delete(self, request, *args, **kwargs):
         # Comment.objects.delete_comment(kwargs['id'])
